@@ -1,0 +1,97 @@
+-- CREATE DATABASE
+CREATE DATABASE grafika_test;
+
+-- USE DATABASE
+USE grafika_test
+
+-- CREATE TABLE
+CREATE TABLE lokasi (
+  -- Maybe set id_lokasi into AUTO_INCREMENT?
+  id_lokasi INT UNIQUE,
+  nama_lokasi TEXT,
+  longitude DOUBLE,
+  latitude DOUBLE,
+  PRIMARY KEY (id_lokasi)
+);
+
+CREATE TABLE kapal (
+  id_kapal INT UNIQUE,
+  nama_kapal TEXT,
+  jenis_kapal TEXT,
+  tahun_pembuatan INT,
+  -- Maybe change `kapal_tonase` type?
+  kapal_tonase TEXT,
+  PRIMARY KEY (id_kapal)
+);
+
+CREATE TABLE jadwal_penangkapan (
+  id_jadwal INT,
+  id_perkiraan INT,
+  lokasi_id INT,
+  kapal_id INT,
+  tanggal_kembali DATE,
+  tanggal_berangkat DATE,
+  PRIMARY KEY (id_jadwal, kapal_id, lokasi_id),
+  CONSTRAINT `kapal_id_fk` FOREIGN KEY (kapal_id) REFERENCES kapal(id_kapal),
+  CONSTRAINT `lokasi_id_fk` FOREIGN KEY (lokasi_id) REFERENCES lokasi(id_lokasi)
+);
+
+CREATE TABLE harga_ikan (
+  id_harga INT UNIQUE,
+  jenis_ikan TEXT,
+  harga_per_kg DOUBLE,
+  tanggal DATE,
+  PRIMARY KEY (id_harga)
+);
+
+CREATE TABLE stok_ikan (
+  id_stok INT UNIQUE,
+  jenis_ikan TEXT,
+  jumlah_stok INT,
+  harga_id INT,
+  tanggal DATE,
+  PRIMARY KEY (id_stok),
+  -- Not specified as foreign key in ERD
+  CONSTRAINT `stok_ikan_harga_id_fk` FOREIGN KEY (harga_id) REFERENCES harga_ikan(id_harga)
+
+);
+
+CREATE TABLE hasil_penangkapan (
+  id_hasil INT UNIQUE,
+  jadwal_id INT,
+  jumlah_ikan INT,
+  jenis_ikan TEXT,
+  stok_id INT,
+  berat_total_kg INT,
+  -- Probably need to set `jadwal_id` to PRIMARY KEY? no?
+  PRIMARY KEY (id_hasil),
+  -- foreign key not defined yet in ERD? Comment below to get as the same as the ERD
+  CONSTRAINT `hasil_penangkapan_stok_id_fk` FOREIGN KEY (stok_id) REFERENCES stok_ikan(id_stok),
+  CONSTRAINT `hasil_penangkapan_jadwal_id_fk` FOREIGN KEY (jadwal_id) REFERENCES jadwal_penangkapan(id_jadwal)
+);
+
+CREATE TABLE perkiraan_cuaca (
+  id_perkiraan INT,
+  nama_lokasi TEXT,
+  cuaca TEXT,
+  arah_angin TEXT,
+  kecepatan_angin DOUBLE,
+  PRIMARY KEY (id_perkiraan)
+);
+
+-- INSERT DATA
+
+INSERT INTO lokasi (id_lokasi, nama_lokasi, latitude, longitude) VALUES (1, 'test1', 1, 1);
+
+INSERT INTO perkiraan_cuaca (id_perkiraan, cuaca, arah_angin, kecepatan_angin, nama_lokasi) VALUES (1, 'Cerah', 'Utara', 20, 'test1');
+
+INSERT INTO kapal (id_kapal, nama_kapal, jenis_kapal, tahun_pembuatan, kapal_tonase) VALUES (1, 'test1', 'jenis1', 2024, 'test1');
+
+INSERT INTO harga_ikan (id_harga,jenis_ikan, harga_per_kg, tanggal) VALUES (1, 'jenis1', 10, '2024-11-11');
+
+INSERT INTO stok_ikan (id_stok, jenis_ikan, harga_id, tanggal, jumlah_stok) VALUES (1, 'jenis1', 1, '2024-11-11', 10);
+
+INSERT INTO jadwal_penangkapan (id_jadwal, id_perkiraan, lokasi_id, kapal_id, tanggal_kembali, tanggal_berangkat) VALUES (1, 1, 1, 1, '2024-11-11', '2024-11-12');
+
+INSERT INTO hasil_penangkapan (id_hasil, jadwal_id, jenis_ikan, jumlah_ikan, berat_total_kg, stok_id) VALUES (1, 1, 'jenis1', 8, 10, 1);
+

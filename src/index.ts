@@ -36,3 +36,4 @@ api.route('/rekap', hasilPenangkapan)
 app.route('/', login)
 
 export default app
+
